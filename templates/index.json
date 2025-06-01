@@ -1,0 +1,31 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "hello-world",
+      "settings": {}
+    },
+    "product-collection": {
+      "type": "product-collection",
+      "settings": {
+        "title": "Featured Collection",
+        "collection": "all-product",
+        "products_to_show": 4,
+        "layout_type": "carousel",
+        "columns": 1
+      }
+    }
+  },
+  "order": [
+    "main",
+    "product-collection"
+  ]
+}

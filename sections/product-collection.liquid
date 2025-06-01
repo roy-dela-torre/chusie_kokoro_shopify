@@ -1,0 +1,151 @@
+{% comment %}
+  Product Collection Section
+  Now supports Bootstrap grid or Owl Carousel layout
+{% endcomment %}
+
+<section class="product_collection">
+  <div class="wrapper">
+    <div class="conatiner-fluid">
+      <div class="page-width">
+        {% if section.settings.title != blank %}
+          <h2 class="section-title">{{ section.settings.title }}</h2>
+        {% endif %}
+
+        {% assign collection = collections[section.settings.collection] %}
+        {% assign columns = section.settings.columns | default: 4 %}
+        {% assign layout_type = section.settings.layout_type | default: 'grid' %}
+
+        {% if collection and collection.products_count > 0 %}
+          {% if layout_type == 'grid' %}
+            <div class="row">
+              {% for product in collection.products limit: section.settings.products_to_show %}
+                <div class="col-12 col-md-{{ 12 | divided_by: columns | round }}">
+                  <div class="card-wrapper">
+                    <a href="{{ product.url | within: collection }}" class="card">
+                      {% if product.featured_image %}
+                        <img
+                          src="{{ product.featured_image | img_url: '400x' }}"
+                          alt="{{ product.title | escape }}"
+                          class="card__image"
+                          loading="lazy"
+                          width="400"
+                          height="400"
+                        >
+                      {% endif %}
+                      <div class="card__content">
+                        <h3 class="card__heading">{{ product.title }}</h3>
+                        <span class="card__price">{{ product.price | money }}</span>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="carousel-wrapper">
+              <div class="carousel owl-carousel">
+                {% for product in collection.products limit: section.settings.products_to_show %}
+                  <div class="item">
+                    <div class="card-wrapper">
+                      <a href="{{ product.url | within: collection }}" class="card">
+                        {% if product.featured_image %}
+                          <img
+                            src="{{ product.featured_image | img_url: '400x' }}"
+                            alt="{{ product.title | escape }}"
+                            class="card__image"
+                            loading="lazy"
+                            width="400"
+                            height="400"
+                          >
+                        {% endif %}
+                        <div class="card__content">
+                          <h3 class="card__heading">{{ product.title }}</h3>
+                          <span class="card__price">{{ product.price | money }}</span>
+                        </div>
+                      </a>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+        {% else %}
+          <p>No products found in this collection.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Product Collection",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section title",
+      "default": "Featured Collection"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "label": "Products to show",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "select",
+      "id": "layout_type",
+      "label": "Layout type",
+      "options": [
+        { "value": "grid", "label": "Grid (Bootstrap)" },
+        { "value": "carousel", "label": "Carousel (Owl Carousel)" }
+      ],
+      "default": "grid"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Columns (for grid/carousel)",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 4
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Collection"
+    }
+  ]
+}
+{% endschema %}
+
+{% if section.settings.layout_type == 'carousel' %}
+  <link rel="stylesheet" href="{{ 'owl.carousel.min.css' | asset_url }}">
+  <link rel="stylesheet" href="{{ 'owl.theme.default.min.css' | asset_url }}">
+  <script src="{{ 'owl.carousel.min.js' | asset_url }}" async></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      $('.carousel.owl-carousel').owlCarousel({
+        loop: false,
+        margin: 20,
+        nav: true,
+        dots: true,
+        responsive: {
+          0: { items: 1 },
+          600: { items: 2 },
+          900: { items: {{ columns }} }
+        }
+      });
+    });
+  </script>
+{% endif %}

@@ -1,0 +1,7 @@
+p:last-of-type{
+    margin-bottom: 0;
+}
+
+section{
+    padding: 100px clamp(20px, 5vw, 30px);
+}
