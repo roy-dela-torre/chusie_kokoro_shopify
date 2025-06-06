@@ -1,0 +1,183 @@
+{{ 'banner.css' | asset_url | stylesheet_tag }}
+<section class="collection_banner">
+  <div class="wrapper">
+    <div class="container-xl">
+      <div class="col-md-12">
+        <div class="main_content">
+          <div class="row align-items-center">
+            <div class="col-lg-6">
+              <div class="content">
+                <span>{{ section.settings.category | default: 'Categories' }}</span>
+                <h2 class="text-white">{{ section.settings.heading | default: 'Enhance Your Music Experience' }}</h2>
+                {% if section.settings.mobile_image != blank %}
+                  <img
+                    src="{{ section.settings.mobile_image | img_url: '800x' }}"
+                    alt="{{ section.settings.mobile_image.alt | default: section.settings.heading }}"
+                    class="w-100 d-block d-lg-none mb-4"
+                    width="auto"
+                    height="auto"
+                  >
+                {% else %}
+                  <img
+                    src="{{ section.settings.desktop_image | img_url: '1200x' }}"
+                    alt="{{ section.settings.desktop_image.alt | default: section.settings.heading }}"
+                    class="w-100 d-block d-lg-none mb-4"
+                    width="auto"
+                    height="auto"
+                  >
+                {% endif %}
+                <div class="time">
+                  <div class="time-item" data-unit="days">
+                    <span class="label">Days</span>
+                    <span class="value">00</span>
+                  </div>
+                  <div class="time-item" data-unit="hours">
+                    <span class="label">Hours</span>
+                    <span class="value">00</span>
+                  </div>
+                  <div class="time-item" data-unit="minutes">
+                    <span class="label">Minutes</span>
+                    <span class="value">00</span>
+                  </div>
+                  <div class="time-item" data-unit="seconds">
+                    <span class="label">Seconds</span>
+                    <span class="value">00</span>
+                  </div>
+                </div>
+
+                <a
+                  href="{{ section.settings.button_link | default: '#' }}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="green_btn"
+                >
+                  {{ section.settings.button_text | default: 'Buy Now!' }}
+                </a>
+              </div>
+            </div>
+            <div class="col-lg-6 d-none d-lg-block">
+              <div class="image">
+                <img
+                  src="{{ section.settings.desktop_image | img_url: '1200x' }}"
+                  alt="{{ section.settings.desktop_image.alt | default: section.settings.heading }}"
+                  width="auto"
+                  height="auto"
+                  class="w-100"
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+  $(function () {
+    var end = "{{ collection.metafields.custom.sale_timer | date: '%Y-%m-%dT%H:%M:%S%z' }}";
+
+    var endDate = new Date(end);
+
+    // Fallback if invalid end date
+    if (isNaN(endDate.getTime())) {
+      endDate = new Date();
+      endDate.setHours(endDate.getHours() + 2);
+    }
+
+    function updateCountdown() {
+      var now = new Date().getTime();
+      var distance = endDate - now;
+
+      if (distance < 0) {
+        clearInterval(countdown);
+
+        // Optional: Hide the entire section
+        $('.collection_banner').remove(); // or use `.hide()` if you want to preserve it in the DOM
+        return;
+      }
+
+      var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      $('.time .time-item[data-unit="days"] .value').text(String(days).padStart(2, '0'));
+      $('.time .time-item[data-unit="hours"] .value').text(String(hours).padStart(2, '0'));
+      $('.time .time-item[data-unit="minutes"] .value').text(String(minutes).padStart(2, '0'));
+      $('.time .time-item[data-unit="seconds"] .value').text(String(seconds).padStart(2, '0'));
+    }
+
+    updateCountdown();
+    var countdown = setInterval(updateCountdown, 1000);
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Collection Banner",
+  "settings": [
+    {
+      "type": "text",
+      "id": "category",
+      "label": "Category",
+      "default": "Categories"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Enhance Your Music Experience"
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "Mobile Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "desktop_image",
+      "label": "Desktop Image"
+    },
+    {
+      "type": "text",
+      "id": "hours",
+      "label": "Hours",
+      "default": "23"
+    },
+    {
+      "type": "text",
+      "id": "days",
+      "label": "Days",
+      "default": "05"
+    },
+    {
+      "type": "text",
+      "id": "minutes",
+      "label": "Minutes",
+      "default": "59"
+    },
+    {
+      "type": "text",
+      "id": "seconds",
+      "label": "Seconds",
+      "default": "35"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Link"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "Buy Now!"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection Banner"
+    }
+  ]
+}
+{% endschema %}

@@ -1,16 +1,9 @@
-{% comment %}
-  Product Collection Section
-  Now supports Bootstrap grid or Owl Carousel layout
-{% endcomment %}
+<link rel="stylesheet" href="{{ 'product-collection.css' | asset_url }}" type="text/css" media="all">
 
-<section class="product_collection">
+<section class="product_collection" style="background-color: {{ section.settings.bg_color | default: '#fff' }};">
   <div class="wrapper">
-    <div class="conatiner-fluid">
+    <div class="container-xl">
       <div class="page-width">
-        {% if section.settings.title != blank %}
-          <h2 class="section-title">{{ section.settings.title }}</h2>
-        {% endif %}
-
         {% assign collection = collections[section.settings.collection] %}
         {% assign columns = section.settings.columns | default: 4 %}
         {% assign layout_type = section.settings.layout_type | default: 'grid' %}
@@ -18,55 +11,104 @@
         {% if collection and collection.products_count > 0 %}
           {% if layout_type == 'grid' %}
             <div class="row">
+              <div class="col-md-12">
+                <div class="header d-flex justify-content-between align-items-end">
+                  {% if section.settings.title != blank %}
+                    <div class="left_content">
+                      <div class="top_header">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="40" viewBox="0 0 20 40" fill="none">
+                          <rect width="20" height="40" rx="4" fill="#DB4444"/>
+                        </svg>
+                        <span>{{ section.setting.top_header | default: 'This Month' }}</span>
+                      </div>
+                      <h2 class="section-title" style="color: {{ section.settings.h2_color | default: '#222' }};">
+                        {{ section.settings.title }}
+                      </h2>
+                    </div>
+                  {% endif %}
+                  {% if collection %}
+                    <a href="{{ collection.url }}" target="_blank" rel="noopener noreferrer" class="view_all"
+                      >View All</a
+                    >
+                  {% endif %}
+                </div>
+              </div>
               {% for product in collection.products limit: section.settings.products_to_show %}
                 <div class="col-12 col-md-{{ 12 | divided_by: columns | round }}">
-                  <div class="card-wrapper">
-                    <a href="{{ product.url | within: collection }}" class="card">
-                      {% if product.featured_image %}
-                        <img
-                          src="{{ product.featured_image | img_url: '400x' }}"
-                          alt="{{ product.title | escape }}"
-                          class="card__image"
-                          loading="lazy"
-                          width="400"
-                          height="400"
-                        >
-                      {% endif %}
-                      <div class="card__content">
-                        <h3 class="card__heading">{{ product.title }}</h3>
-                        <span class="card__price">{{ product.price | money }}</span>
+                  <div class="product_content position-relative">
+                    <a href="{{ product.url | within: collection }}" class="stretched-link"></a>
+                    {% if product.featured_image %}
+                      <img
+                        src="{{ product.featured_image | img_url: '400x' }}"
+                        alt="{{ product.title | escape }}"
+                        class="card__image"
+                        loading="lazy"
+                        width="400"
+                        height="400"
+                      >
+                    {% endif %}
+                    <div class="product_main_content">
+                      <h3 class="product_title">{{ product.title }}</h3>
+                      <div class="product_price">
+                        {% if product.compare_at_price > product.price %}
+                          <span class="sale_price">{{ product.price | money }}</span>
+                          <span class="original_price"
+                            ><s>{{ product.compare_at_price | money }}</s></span
+                          >
+                        {% else %}
+                          <span class="regular_price">{{ product.price | money }}</span>
+                        {% endif %}
                       </div>
-                    </a>
+                    </div>
                   </div>
                 </div>
               {% endfor %}
             </div>
           {% else %}
-            <div class="carousel-wrapper">
+            <div class="carousel-wrapper d-flex flex-column">
+              <div class="header d-flex justify-content-between align-items-end">
+                {% if section.settings.title != blank %}
+                  <div class="left_content">
+                    <div class="top_header">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="40" viewBox="0 0 20 40" fill="none">
+                        <rect width="20" height="40" rx="4" fill="#DB4444"/>
+                      </svg>
+                      <span>{{ section.setting.top_header | default: 'This Month' }}</span>
+                    </div>
+                    <h2 class="section-title mb-0" style="color: {{ section.settings.h2_color | default: '#222' }};">
+                      {{ section.settings.title }}
+                    </h2>
+                  </div>
+                {% endif %}
+                <div class="group_btn">
+                  <button class="prev">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <path d="M11 5L4 12L11 19M4 12H20" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                  <button class="next">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                      <path d="M3.5 12H20M20 12L13 5M20 12L13 19" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
               <div class="carousel owl-carousel">
                 {% for product in collection.products limit: section.settings.products_to_show %}
                   <div class="item">
-                    <div class="card-wrapper">
-                      <a href="{{ product.url | within: collection }}" class="card">
-                        {% if product.featured_image %}
-                          <img
-                            src="{{ product.featured_image | img_url: '400x' }}"
-                            alt="{{ product.title | escape }}"
-                            class="card__image"
-                            loading="lazy"
-                            width="400"
-                            height="400"
-                          >
-                        {% endif %}
-                        <div class="card__content">
-                          <h3 class="card__heading">{{ product.title }}</h3>
-                          <span class="card__price">{{ product.price | money }}</span>
-                        </div>
-                      </a>
-                    </div>
+                    {% render 'product_cards', product: product, collection: collection %}
                   </div>
                 {% endfor %}
               </div>
+              {% if collection %}
+                <a
+                  href="{{ collection.url }}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="red_btn view_all mx-auto"
+                  >View All</a
+                >
+              {% endif %}
             </div>
           {% endif %}
         {% else %}
@@ -88,6 +130,12 @@
       "default": "Featured Collection"
     },
     {
+      "type": "text",
+      "id": "top_header",
+      "label": "Top Header Text",
+      "default": "Featured Products"
+    },
+    {
       "type": "collection",
       "id": "collection",
       "label": "Collection"
@@ -98,6 +146,15 @@
       "label": "Products to show",
       "min": 2,
       "max": 12,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "carousel_items",
+      "label": "Carousel items per slide",
+      "min": 1,
+      "max": 6,
       "step": 1,
       "default": 4
     },
@@ -119,6 +176,17 @@
       "max": 12,
       "step": 1,
       "default": 4
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "h2_color",
+      "label": "Section title color"
     }
   ],
   "presets": [
@@ -130,21 +198,35 @@
 {% endschema %}
 
 {% if section.settings.layout_type == 'carousel' %}
-  <link rel="stylesheet" href="{{ 'owl.carousel.min.css' | asset_url }}">
-  <link rel="stylesheet" href="{{ 'owl.theme.default.min.css' | asset_url }}">
-  <script src="{{ 'owl.carousel.min.js' | asset_url }}" async></script>
+  {{ 'owl.carousel.min.css' | asset_url | stylesheet_tag }}
+  {{ 'owl.theme.default.min.css' | asset_url | stylesheet_tag }}
+
+  <script src="{{ 'jquery.min.js' | asset_url }}" defer></script>
+  <script src="{{ 'owl.carousel.min.js' | asset_url }}" defer></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    var carousel_item = {{ section.settings.carousel_items | default: 4 }};
+    if(carousel_item > 4){
+      carousel_item = 4;
+    }
+    $(document).ready(function () {
       $('.carousel.owl-carousel').owlCarousel({
         loop: false,
-        margin: 20,
-        nav: true,
-        dots: true,
+        margin: 30,
+        nav: false,
+        dots: false,
+        items: {{ section.settings.carousel_items }},
         responsive: {
           0: { items: 1 },
           600: { items: 2 },
-          900: { items: {{ columns }} }
+          900: { items: carousel_item }
         }
+      });
+
+      $('.group_btn .prev').click(function () {
+        $('.carousel.owl-carousel').trigger('prev.owl.carousel');
+      });
+      $('.group_btn .next').click(function () {
+        $('.carousel.owl-carousel').trigger('next.owl.carousel');
       });
     });
   </script>

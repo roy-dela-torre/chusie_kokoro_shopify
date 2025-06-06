@@ -1,47 +1,69 @@
-{% comment %}
-  This section is used in the collection template to render collection page
-  listing all products within a collection.
-
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/collection
-{% endcomment %}
-
-<h1>{{ collection.title }}</h1>
-
-<div class="collection-products">
-  {% paginate collection.products by 20 %}
-    {% for product in collection.products %}
-      <div class="collection-product">
-        {% if product.featured_image %}
-          {% render 'image',
-            class: 'collection-product__image',
-            image: product.featured_image,
-            url: product.url,
-            width: 400,
-            height: 400,
-            crop: 'center'
-          %}
-        {% endif %}
-        <div class="collection-product__content">
-          <p>{{ product.title | escape | link_to: product.url }}</p>
-          <p>{{ product.price | money }}</p>
+<section class="collections">
+  <div class="wrapper">
+    <div class="container-xl">
+      <div class="row justify-content-center">
+        <div class="col-md-12">
+          <div class="header">
+            <h1>{{ collection.title }}</h1>
+          </div>
         </div>
+        {% paginate collection.products by 6 %}
+          {% for product in collection.products %}
+            <div class="col-lg-4 col-md-6">
+              {% render 'product_cards', product: product, collection: collection %}
+            </div>
+          {% endfor %}
+        {% endpaginate %}
+        {% if collection.products_count > 6 %}
+          <div class="col-md-12 d-flex">
+            <button class="load_more red_btn mx-auto" id="load-more-btn" data-next-page="2">Load More</button>
+          </div>
+        {% endif %}
       </div>
-    {% endfor %}
+    </div>
+  </div>
+</section>
 
-    {{ paginate | default_pagination }}
-  {% endpaginate %}
-</div>
+<script>
+  $(document).ready(function () {
+    var $loadMoreBtn = $('#load-more-btn');
+    if (!$loadMoreBtn.length) return;
 
-{% stylesheet %}
-  .collection-products {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
-  }
-{% endstylesheet %}
+    // Before AJAX: show loading state
+    function beforeLoad() {
+      $loadMoreBtn.prop('disabled', true).text('Loading...');
+    }
 
-{% schema %}
-{
-  "name": "t:general.collection",
-  "settings": []
-}
-{% endschema %}
+    // After AJAX: reset loading state
+    function afterLoad() {
+      $loadMoreBtn.prop('disabled', false).text('Load More');
+    }
+
+    $loadMoreBtn.on('click', function () {
+      var nextPage = $loadMoreBtn.data('next-page');
+      beforeLoad();
+      $.ajax({
+        url: window.location.pathname + '?page=' + nextPage + '&section_id={{ section.id }}',
+        type: 'GET',
+        success: function (html) {
+          // Extract only the product cards from the returned HTML
+          var $tempDiv = $('<div>').html(html);
+          var $newProducts = $tempDiv.find('#collection-products-list .col-lg-4');
+          var $productsList = $('#collection-products-list');
+          $newProducts.each(function () {
+            $productsList.append($(this));
+          });
+          // Update next page or hide button if done
+          if ($newProducts.length < 6) {
+            $loadMoreBtn.hide();
+          } else {
+            $loadMoreBtn.data('next-page', parseInt(nextPage) + 1);
+          }
+        },
+        complete: function () {
+          afterLoad();
+        }
+      });
+    });
+  });
+</script>

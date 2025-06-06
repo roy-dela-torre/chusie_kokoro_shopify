@@ -9,23 +9,37 @@
  */
 {
   "sections": {
-    "main": {
-      "type": "hello-world",
-      "settings": {}
-    },
     "product-collection": {
       "type": "product-collection",
       "settings": {
         "title": "Featured Collection",
+        "top_header": "Featured Products",
         "collection": "all-product",
-        "products_to_show": 4,
+        "products_to_show": 12,
         "layout_type": "carousel",
-        "columns": 1
+        "columns": 4,
+        "bg_color": "#aeaeae",
+        "h2_color": "#000000"
+      }
+    },
+    "banner_KmHDwX": {
+      "type": "banner",
+      "name": "collection_banner",
+      "settings": {
+        "category": "Categories",
+        "heading": "Enhance Your Music Experience",
+        "desktop_image": "shopify://shop_images/banner.png",
+        "hours": "23",
+        "days": "05",
+        "minutes": "59",
+        "seconds": "35",
+        "button_link": "",
+        "button_text": "Buy Now!"
       }
     }
   },
   "order": [
-    "main",
-    "product-collection"
+    "product-collection",
+    "banner_KmHDwX"
   ]
 }

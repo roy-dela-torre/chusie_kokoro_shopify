@@ -1,26 +1,34 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
-    <title>{{ page_title }}</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{{ page_title }}</title>
     <meta name="description" content="{{ page_description | escape }}">
     <link rel="canonical" href="{{ canonical_url }}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css">
-    <script src="{{ 'jquery.min.js' | asset_url }}" async></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" async></script>
-    <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+
+    <!-- Stylesheets -->
+    {{ 'bootstrap.min.css' | asset_url | stylesheet_tag }}
+    {{ 'global.css' | asset_url | stylesheet_tag }}
+    {{ 'header.css' | asset_url | stylesheet_tag }}
+    {{ 'fonts.css' | asset_url | stylesheet_tag }}
+    {% if template == 'index' %}
+      {{ 'index.css' | asset_url | stylesheet_tag }}
+    {% endif %}
+
+    <!-- Scripts: Load jQuery early (defer-safe), other scripts async if independent -->
+    <script src="{{ 'jquery.min.js' | asset_url }}"></script>
+    <script src="{{ 'bootstrap.bundle.min.js' | asset_url }}" defer></script>
+
     {{ content_for_header }}
-    <!-- Header hook for plugins -->
+    <!-- Header hook for apps/plugins -->
   </head>
   <body>
-    <body>
-      {% sections 'header-group' %}
+    {% sections 'header-group' %}
 
-      {{ content_for_layout }}
+    {{ content_for_layout }}
 
-      {% sections 'footer-group' %}
-    </body>
+    {% sections 'footer-group' %}
   </body>
-  
 </html>
